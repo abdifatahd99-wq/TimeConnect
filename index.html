@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TimeConnect — World Clock</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"></head>
+<body>
+
+<nav class="tc-navigation">
+  <a href="/" class="tc-brand">🌍 TimeConnect</a>
+  <div class="tc-links">
+    <a href="/">World Clock</a>
+    <a href="/meeting.html">Meeting Planner</a>
+    <a href="/premium.html">Premium</a>
+  </div>
+</nav>
+<style>
+.tc-navigation{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:15px;
+  padding:18px 25px;
+  background:#151b32;
+  border-bottom:1px solid #303858;
+}
+.tc-brand{
+  font-size:22px;
+  font-weight:bold;
+  color:#c4b5fd;
+  text-decoration:none;
+}
+.tc-links{
+  display:flex;
+  flex-wrap:wrap;
+  gap:20px;
+}
+.tc-links a{
+  color:#e2e8f0;
+  text-decoration:none;
+}
+.tc-links a:hover{color:#a78bfa}
+</style>
+
+<header class="topbar"><a class="brand" href="#"><span>◷</span> TimeConnect</a><nav><a href="#clocks">World Clock</a><a href="#converter">Converter</a><a href="#planner">Planner</a><a href="#countries">Countries</a><a href="/meeting.html">📅 Meeting Planner</a>
+<a href="/premium.html">✨ Premium Dashboard</a>
+</nav><button id="formatBtn" class="format-btn">24-hour</button></header>
+<main>
+<section class="hero"><div><p class="eyebrow">YOUR WORLD, IN ONE PLACE</p><h1>Time, <span>connected.</span></h1><p class="sub">Know the time anywhere. Plan across time zones with confidence.</p></div><div class="hero-clock"><span>Your selected local time</span><strong id="localTime">--:--</strong><span id="localDate">Loading…</span><label for="localZone">Choose timezone</label><select id="localZone"></select></div></section>
+<section id="clocks" class="section"><div class="section-head"><div><p class="eyebrow">LIVE WORLD TIMES</p><h2>Your world clocks</h2></div><div class="search-wrap"><input id="citySearch" placeholder="Search city or timezone…" autocomplete="off"><button id="addCity">+ Add</button><div id="suggestions"></div></div></div><div id="clockGrid" class="clock-grid"></div><p class="hint">Saved on this device. Search a city and add it.</p></section>
+<section id="converter" class="section split"><div><p class="eyebrow">TIMEZONE CONVERTER</p><h2>Convert a moment</h2><p class="sub">See the same moment in two different places.</p></div><div class="panel converter"><label>From timezone<select id="fromZone"></select></label><label>To timezone<select id="toZone"></select></label><label>Date and time<input id="convertDate" type="datetime-local"></label><button id="convertBtn">Convert time</button><div id="convertResult" class="result"></div></div></section>
+<section id="planner" class="section split"><div><p class="eyebrow">MEETING PLANNER</p><h2>Find a good time</h2><p class="sub">Compare a meeting across time zones.</p></div><div class="panel converter"><label>Meeting date/time<input id="meetingDate" type="datetime-local"></label><label>Timezone A<select id="meetingA"></select></label><label>Timezone B<select id="meetingB"></select></label><button id="meetingBtn">Show both times</button><div id="meetingResult" class="result"></div></div></section>
+<section id="countries" class="section"><p class="eyebrow">COUNTRY DIRECTORY</p><h2>Explore countries</h2><p class="sub">Search countries and discover their time zones.</p><label for="countrySelect">Search and select a country</label>
+<input id="countrySearch" class="country-search" type="search" placeholder="🔎 Search any country..." autocomplete="off">
+<p id="countryCount" class="country-count">Loading countries...</p>
+<select id="countrySelect" class="country-search">
+<option value="">Choose a country...</option>
+</select><div id="countryGrid" class="country-grid"></div><div id="countryDetails" class="panel country-details"></div></section>
+<section class="section"><p class="eyebrow">WORLD MAP</p><h2>Explore the globe</h2><div class="map-search"><input id="mapSearch" placeholder="Search city or country..." autocomplete="off"><button id="mapSearchBtn">Find on map</button></div><div id="mapSuggestions"></div><button id="resetMapBtn" class="format-btn" type="button">↺ Reset world view</button>
+<button id="fullMapBtn" class="format-btn" type="button">⛶ Full screen map</button>
+<button id="locateMeBtn" class="format-btn" type="button">◎ Locate me</button><div id="map" style="height:420px;border-radius:16px;margin-top:14px"></div></section>
+</main><footer><span>© <span id="year"></span> TimeConnect</span><span>Every place. Every time.</span></footer>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="script.js"></script></body></html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TimeConnect — Meeting Planner</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1020;color:#fff;font-family:Arial,sans-serif}
+header{padding:25px;text-align:center;background:#151b32}
+header h1{color:#a78bfa;margin:0}
+main{max-width:1100px;margin:auto;padding:25px}
+.card{background:#151b32;padding:22px;border-radius:18px;margin-bottom:20px}
+h2{color:#c4b5fd}
+label{display:block;margin:14px 0 7px}
+input,select,button{padding:12px;border-radius:9px;border:1px solid #39415e;background:#0b1020;color:white;font-size:15px}
+button{background:#7c3aed;border:0;cursor:pointer;margin-top:15px}
+button:hover{background:#6d28d9}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px}
+.city{background:#202844;padding:14px;border-radius:12px}
+.city label{display:flex;gap:10px;align-items:center;margin:0}
+.city input{width:18px;height:18px}
+.result{padding:14px;background:#202844;border-radius:12px;margin:10px 0}
+.best{border:2px solid #a78bfa;background:#292044}
+.small{color:#aab3ce;font-size:13px}
+a{color:#c4b5fd}
+</style>
+</head>
+<body>
+
+<nav class="tc-navigation">
+  <a href="/" class="tc-brand">🌍 TimeConnect</a>
+  <div class="tc-links">
+    <a href="/">World Clock</a>
+    <a href="/meeting.html">Meeting Planner</a>
+    <a href="/premium.html">Premium</a>
+  </div>
+</nav>
+<style>
+.tc-navigation{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:15px;
+  padding:18px 25px;
+  background:#151b32;
+  border-bottom:1px solid #303858;
+}
+.tc-brand{
+  font-size:22px;
+  font-weight:bold;
+  color:#c4b5fd;
+  text-decoration:none;
+}
+.tc-links{
+  display:flex;
+  flex-wrap:wrap;
+  gap:20px;
+}
+.tc-links a{
+  color:#e2e8f0;
+  text-decoration:none;
+}
+.tc-links a:hover{color:#a78bfa}
+</style>
+
+<header>
+<h1>🌍 TimeConnect</h1>
+<p>Find the perfect meeting time worldwide</p>
+</header>
+<main>
+<div class="card">
+<h2>📅 Meeting Planner</h2>
+<label>Your meeting date</label>
+<input type="date" id="date">
+<label>Time in Hargeisa</label>
+<input type="time" id="time" value="10:00">
+<label>Meeting duration</label>
+<select id="duration">
+<option value="30">30 minutes</option>
+<option value="60" selected>1 hour</option>
+<option value="90">90 minutes</option>
+<option value="120">2 hours</option>
+</select>
+</div>
+
+<div class="card">
+<h2>🌎 Participants</h2>
+<div class="grid" id="cities"></div>
+<button onclick="findBest()">✨ Find Best Meeting Times</button>
+</div>
+
+<div class="card">
+<h2>🏆 Best Meeting Times</h2>
+<div id="results">Select participants and click Find Best Meeting Times.</div>
+</div>
+
+<div class="card">
+<h2>🕒 Selected Meeting Schedule</h2>
+<div id="schedule">Choose a meeting time to see everyone's local time.</div>
+<button onclick="copySchedule()">📋 Copy Schedule</button>
+</div>
+<p><a href="/">← Back to TimeConnect</a></p>
+</main>
+<script>
+const zones=[
+["🇸🇴 Hargeisa","Africa/Mogadishu"],
+["🇬🇧 London","Europe/London"],
+["🇺🇸 New York","America/New_York"],
+["🇦🇪 Dubai","Asia/Dubai"],
+["🇯🇵 Tokyo","Asia/Tokyo"],
+["🇫🇷 Paris","Europe/Paris"],
+["🇸🇬 Singapore","Asia/Singapore"],
+["🇦🇺 Sydney","Australia/Sydney"],
+["🇺🇸 Los Angeles","America/Los_Angeles"],
+["🇪🇬 Cairo","Africa/Cairo"],
+["🇮🇳 Mumbai","Asia/Kolkata"],
+["🇧🇷 São Paulo","America/Sao_Paulo"],
+["🇿🇦 Johannesburg","Africa/Johannesburg"],
+["🇨🇦 Toronto","America/Toronto"]
+];
+const cities=document.getElementById("cities");
+zones.forEach((z,i)=>{
+const d=document.createElement("div");
+d.className="city";
+d.innerHTML=`<label><input type="checkbox" value="${z[1]}" ${i<4?"checked":""}>${z[0]}</label>`;
+cities.appendChild(d);
+});
+const dateInput=document.getElementById("date");
+dateInput.value=new Date().toLocaleDateString("en-CA");
+function localParts(date,zone){
+return new Intl.DateTimeFormat("en-GB",{
+timeZone:zone,year:"numeric",month:"2-digit",day:"2-digit",
+hour:"2-digit",minute:"2-digit",hourCycle:"h23"
+}).formatToParts(date).reduce((o,p)=>(o[p.type]=p.value,o),{});
+}
+function convertHargeisa(date,time){
+const [y,m,d]=date.split("-").map(Number);
+const [h,min]=time.split(":").map(Number);
+const target=Date.UTC(y,m-1,d,h,min);
+let instant=target-3*3600000;
+for(let i=0;i<3;i++){
+const p=localParts(new Date(instant),"Africa/Mogadishu");
+const actual=Date.UTC(+p.year,+p.month-1,+p.day,+p.hour,+p.minute);
+instant+=target-actual;
+}
+return new Date(instant);
+}
+function format(date,zone){
+return new Intl.DateTimeFormat("en-US",{
+timeZone:zone,weekday:"short",month:"short",day:"numeric",
+hour:"2-digit",minute:"2-digit",hour12:true
+}).format(date);
+}
+function getSelected(){
+return [...document.querySelectorAll("#cities input:checked")].map(x=>x.value);
+}
+function findBest(){
+const selected=getSelected();
+if(!selected.length){alert("Select at least one city.");return;}
+const date=dateInput.value;
+const duration=+document.getElementById("duration").value;
+const results=[];
+for(let hour=0;hour<24;hour++){
+for(let minute of [0,30]){
+const time=String(hour).padStart(2,"0")+":"+String(minute).padStart(2,"0");
+const start=convertHargeisa(date,time);
+const end=new Date(start.getTime()+duration*60000);
+let score=0,details=[];
+selected.forEach(zone=>{
+const p=localParts(start,zone);
+const e=localParts(end,zone);
+const startHour=+p.hour+(+p.minute)/60;
+const endHour=+e.hour+(+e.minute)/60;
+const ok=startHour>=9&&endHour<=17&&endHour>startHour;
+if(ok)score++;
+details.push({zone,ok});
+});
+results.push({time,start,score,details});
+}
+}
+results.sort((a,b)=>b.score-a.score||a.start-b.start);
+const top=results.slice(0,8);
+document.getElementById("results").innerHTML=
+`<p>Working hours: 09:00–17:00 local time</p>
+<p><strong>${selected.length} participants</strong> · ${duration} minutes</p>`+
+top.map((r,i)=>`<div class="result ${i===0?"best":""}">
+<strong>${i===0?"🏆 BEST OPTION":"Option "+(i+1)}</strong><br>
+Hargeisa: ${format(r.start,"Africa/Mogadishu")}<br>
+<strong>${r.score}/${selected.length} cities in working hours</strong><br>
+<button onclick="showSchedule('${r.start.toISOString()}')">View Schedule</button>
+</div>`).join("");
+showSchedule(top[0].start.toISOString());
+}
+function showSchedule(iso){
+const start=new Date(iso);
+const duration=+document.getElementById("duration").value;
+const end=new Date(start.getTime()+duration*60000);
+const selected=getSelected();
+document.getElementById("schedule").innerHTML=
+`<p><strong>Meeting:</strong> ${format(start,"Africa/Mogadishu")} – ${format(end,"Africa/Mogadishu")} (Hargeisa)</p>`+
+selected.map(zone=>{
+const name=zones.find(z=>z[1]===zone)?.[0]||zone;
+return `<div class="result"><strong>${name}</strong><br>${format(start,zone)} – ${format(end,zone)}</div>`;
+}).join("");
+}
+function copySchedule(){
+const text=document.getElementById("schedule").innerText;
+navigator.clipboard.writeText(text).then(()=>alert("Schedule copied!"));
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.*
+*.backup
+*.backup*
+*.save
+npm-debug.log*
+.DS_Store
+*-backup

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TimeConnect Premium</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1020;color:#fff;font-family:Arial,sans-serif}
+header{padding:30px;text-align:center;background:#151b32}
+h1{color:#c4b5fd}
+main{max-width:1100px;margin:auto;padding:25px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.card{padding:22px;background:#151b32;border:1px solid #303858;border-radius:18px}
+.price{font-size:35px;color:#c4b5fd;font-weight:bold}
+button{background:#7c3aed;color:white;border:0;padding:12px 18px;border-radius:10px;cursor:pointer}
+a{color:#c4b5fd}
+ul{line-height:2}
+</style>
+</head>
+<body>
+
+<nav class="tc-navigation">
+  <a href="/" class="tc-brand">🌍 TimeConnect</a>
+  <div class="tc-links">
+    <a href="/">World Clock</a>
+    <a href="/meeting.html">Meeting Planner</a>
+    <a href="/premium.html">Premium</a>
+  </div>
+</nav>
+<style>
+.tc-navigation{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:15px;
+  padding:18px 25px;
+  background:#151b32;
+  border-bottom:1px solid #303858;
+}
+.tc-brand{
+  font-size:22px;
+  font-weight:bold;
+  color:#c4b5fd;
+  text-decoration:none;
+}
+.tc-links{
+  display:flex;
+  flex-wrap:wrap;
+  gap:20px;
+}
+.tc-links a{
+  color:#e2e8f0;
+  text-decoration:none;
+}
+.tc-links a:hover{color:#a78bfa}
+</style>
+
+<header>
+<h1>✨ TimeConnect Premium</h1>
+<p>Your world. Your time. Connected.</p>
+</header>
+<main>
+<div class="grid">
+<div class="card">
+<h2>🌍 World Clock Pro</h2>
+<ul>
+<li>Unlimited favorite cities</li>
+<li>Advanced clock customization</li>
+<li>World clock comparison</li>
+<li>Beautiful clock themes</li>
+</ul>
+</div>
+<div class="card">
+<h2>📅 Meeting Pro</h2>
+<ul>
+<li>Advanced meeting planner</li>
+<li>Save meeting schedules</li>
+<li>Best meeting time finder</li>
+<li>Share meeting schedules</li>
+</ul>
+</div>
+<div class="card">
+<h2>🚀 Premium</h2>
+<div class="price">$5 <small>/ month</small></div>
+<p>Planned subscription price</p>
+<button onclick="alert('Premium subscriptions are coming soon!')">Coming Soon</button>
+</div>
+</div>
+<div class="card" style="margin-top:20px">
+<h2>⭐ Your Favorites</h2>
+<div id="favorites"></div>
+</div>
+<div class="card" style="margin-top:20px">
+<h2>📅 Saved Meetings</h2>
+<input id="meetingName" placeholder="Meeting name" style="padding:12px;border-radius:8px">
+<input id="meetingDate" type="datetime-local" style="padding:12px;border-radius:8px">
+<button onclick="saveMeeting()">Save Meeting</button>
+<div id="meetings"></div>
+</div>
+<p><a href="/">← Back to TimeConnect</a></p>
+</main>
+<script>
+function favorites(){
+const cities=JSON.parse(localStorage.getItem("tc-cities")||"[]");
+document.getElementById("favorites").innerHTML=cities.filter(c=>c.fav).map(c=>
+`<div class="card" style="margin:10px 0"><strong>${c.name}</strong> — ${c.country||c.zone}
+<br>${new Intl.DateTimeFormat("en-US",{timeZone:c.zone,hour:"2-digit",minute:"2-digit"}).format(new Date())}</div>`
+).join("")||"No favorites yet. Favorite cities on the main page.";
+}
+function saveMeeting(){
+const name=document.getElementById("meetingName").value.trim();
+const date=document.getElementById("meetingDate").value;
+if(!name||!date)return alert("Enter a meeting name and date.");
+const meetings=JSON.parse(localStorage.getItem("tc-meetings")||"[]");
+meetings.push({name,date});
+localStorage.setItem("tc-meetings",JSON.stringify(meetings));
+document.getElementById("meetingName").value="";
+renderMeetings();
+}
+function renderMeetings(){
+const meetings=JSON.parse(localStorage.getItem("tc-meetings")||"[]");
+document.getElementById("meetings").innerHTML=meetings.map((m,i)=>
+`<div class="card" style="margin:10px 0">${m.name}<br>${new Date(m.date).toLocaleString()}<br>
+<button onclick="deleteMeeting(${i})">Delete</button></div>`
+).join("")||"No saved meetings.";
+}
+function deleteMeeting(i){
+const meetings=JSON.parse(localStorage.getItem("tc-meetings")||"[]");
+meetings.splice(i,1);
+localStorage.setItem("tc-meetings",JSON.stringify(meetings));
+renderMeetings();
+}
+favorites();
+renderMeetings();
+</script>
+</body>
+</html>

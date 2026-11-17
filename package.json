@@ -1,0 +1,1 @@
+{"name":"timeconnect","version":"1.0.0","main":"server.js","scripts":{"start":"node server.js"},"dependencies":{"@coroboros/location-timezone":"^1.1.2","countries-and-timezones":"^3.11.0","express":"^4.21.2"}}
